@@ -14,9 +14,9 @@ import java.util.List;
 @Table(name = "events")
 public class PublicEvent {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="events_seq")
-    @SequenceGenerator(name="events_seq",
-            sequenceName="hibernate_sequence_event", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "events_seq")
+    @SequenceGenerator(name = "events_seq",
+            sequenceName = "hibernate_sequence_event", allocationSize = 1)
     @Column(name = "id")
     private Integer id;
 
@@ -46,7 +46,7 @@ public class PublicEvent {
 
     // Create new event
     public PublicEvent(Integer id, String publicEventName, String publicEventStartDate, String publicEventStartTime, int numberHall, String ratingRARS, int ticketsCount) {
-        this.id=id;
+        this.id = id;
         this.publicEventName = publicEventName;
         this.publicEventStartDate = publicEventStartDate;
         this.publicEventStartTime = publicEventStartTime;
@@ -55,8 +55,18 @@ public class PublicEvent {
         this.ticketsIssued = ticketsCount;
     }
 
+    public void increaseSoldTicket() {
+        this.soldTicketsCount++;
+
+    }
+
+    public void decreaseSoldTicket() {
+        this.soldTicketsCount--;
+    }
+
+
     @Override
     public String toString() {
-        return "ID  " + (id==null ? "": id) + "  название: " + publicEventName + "\nАттрибуты: " + publicEventStartDate + "\t" + publicEventStartTime + "\t" + ratingRARS + "\t Номер зала " + numberHall + "\t Выпущено " + ticketsIssued + "\t Билетов продано " + soldTicketsCount;
+        return "ID  " + (id == null ? "" : id) + "  название: " + publicEventName + "\nАттрибуты: " + publicEventStartDate + "\t" + publicEventStartTime + "\t" + ratingRARS + "\t Номер зала " + numberHall + "\t Выпущено " + ticketsIssued + "\t Билетов продано " + soldTicketsCount;
     }
 }

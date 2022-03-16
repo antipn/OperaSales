@@ -2,15 +2,21 @@ package ru.learnup.java2.antipn.spring.boot.operasales.operasales.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.learnup.java2.antipn.spring.boot.operasales.operasales.dto.PublicEventDto;
+import ru.learnup.java2.antipn.spring.boot.operasales.operasales.dto.TicketDto;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.entity.PublicEvent;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.entity.Ticket;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.loggers.Logger;
-import ru.learnup.java2.antipn.spring.boot.operasales.operasales.reporsitories.PublicEventDAO;
+import ru.learnup.java2.antipn.spring.boot.operasales.operasales.mapper.PublicEventMapper;
+import ru.learnup.java2.antipn.spring.boot.operasales.operasales.mapper.TicketMapper;
+import ru.learnup.java2.antipn.spring.boot.operasales.operasales.reporsitories.EventRepository;
+import ru.learnup.java2.antipn.spring.boot.operasales.operasales.reporsitories.TicketRepository;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,22 +25,63 @@ import java.util.Optional;
 //менеджер работы с премьерами будет в единственном числе
 //будет добавлять, удалять и изменять премьеры
 //также будет продавать и возвращать билеты
-public class EventManagerImpl implements OperaManager {
+public class PublicEventManagerImpl implements PublicEventManager {
 
-    private PublicEventDAO publicEventDAO;
     private List<PublicEvent> eventList = new ArrayList<>();
     private Logger mylogger;
 
+    private EventRepository eventRepository;
+    private TicketRepository ticketRepository;
+
+    private final PublicEventMapper mapperE = PublicEventMapper.MAPPER;
+    private final TicketMapper mapperT = TicketMapper.MAPPER;
+
     @Autowired
-    public EventManagerImpl(Logger mylogger, PublicEventDAO publicEventDAO) {
+    public PublicEventManagerImpl(Logger mylogger, EventRepository eventRepository, TicketRepository ticketRepository) {
         this.mylogger = mylogger;
-        this.publicEventDAO = publicEventDAO;
+        this.eventRepository = eventRepository;
+        this.ticketRepository = ticketRepository;
     }
-//    EventRepository eventRepository
-//    TicketRepository ticketRepository
+// controllers level
+
+    @Override
+    public Collection<TicketDto> findAllTickets() {
+        return mapperT.toDtoList(ticketRepository.findAll());
+    }
+
+    @Override
+    public Collection<PublicEventDto> findAllEvents() {
+        return mapperE.toDtoList((eventRepository.findAll()));
+    }
+
+    @Override
+    public TicketDto findTicketById(int id) {
+        return mapperT.toDto(ticketRepository.getById(id));
+    }
+
+    @Override
+    public PublicEventDto findEventById(int id) {
+        return mapperE.toDto(eventRepository.getById(id));
+    }
+
+    //repos level
+
+    public Collection<PublicEvent> getAllEvents() {
+        return eventRepository.findAll();
+    }
+
+    public Boolean deleteEventByIdINDB(int id) {
+        eventRepository.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public Collection<Ticket> getAllTickets() {
+        return ticketRepository.findAll();
+    }
 
     // 2 CREATING DATA FROM CONSOLE
-    private static PublicEvent createEvent() throws IOException {
+    public static PublicEvent createEvent() throws IOException {
 
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Input event name: ");
@@ -53,16 +100,17 @@ public class EventManagerImpl implements OperaManager {
         return event;
     }
 
+
     // 2- ADD EVENT TO DATABASE INPUT DATA FROM CONSOLE
     public void addEvent() throws IOException {
-        PublicEvent event = EventManagerImpl.createEvent();
+        PublicEvent event = PublicEventManagerImpl.createEvent();
         if (event != null) {
             List<Ticket> tickets = new ArrayList<>();
             for (int i = 1; i <= event.getTicketsIssued(); i++) {
                 tickets.add(new Ticket(null, event, i, false));
             }
             event.setTickets(tickets);
-            event = publicEventDAO.addPublicEvent(event);
+            event = eventRepository.save(event);
             System.out.println(event);
         }
     }
@@ -75,14 +123,13 @@ public class EventManagerImpl implements OperaManager {
             tickets.add(new Ticket(null, event, i, false));
         }
         event.setTickets(tickets);
-        event = publicEventDAO.addPublicEvent(event);
+        event = eventRepository.save(event);
         System.out.println(event);
     }
 
     // 1 - SHOW ALL EVENTS TO CONSOLE
-    //@Query()
     public void showEventsInDB() {
-        List<PublicEvent> events = publicEventDAO.getAllPPublicEvent();
+        List<PublicEvent> events = eventRepository.findAll();
 
         for (PublicEvent event : events) {
             System.out.println(event);
@@ -95,9 +142,9 @@ public class EventManagerImpl implements OperaManager {
         showEventsInDB();
         System.out.println("Input ID for deleting event: ");
         Integer inputID = Integer.parseInt(input.readLine());
-        if (publicEventDAO.getPublicEventById(inputID).isPresent()) {
-            Optional<PublicEvent> event = publicEventDAO.getPublicEventById(inputID);
-            publicEventDAO.deletePublicEventById(inputID);
+        if (eventRepository.findById(inputID).isPresent()) { //улучшить код чтобы дважды не ходить в базу!!! переписать!!! через переменную
+            Optional<PublicEvent> event = eventRepository.findById(inputID);
+            eventRepository.deleteById(inputID);
             System.out.println("Event has been deleted: " + event.get().getPublicEventName());
         }
     }
@@ -108,8 +155,8 @@ public class EventManagerImpl implements OperaManager {
         showEventsInDB();
         System.out.println("Input ID for changing event: ");
         Integer inputID = Integer.parseInt(input.readLine());
-        if (publicEventDAO.getPublicEventById(inputID).isPresent()) {
-            Optional<PublicEvent> eventForEdit = publicEventDAO.getPublicEventById(inputID);
+        if (eventRepository.findById(inputID).isPresent()) {
+            Optional<PublicEvent> eventForEdit = eventRepository.findById(inputID);
             PublicEvent event = converterOptionalToPublicEvent(eventForEdit);
             List<Ticket> eventTicketList = event.getTickets();
             Boolean changeProcess = true;
@@ -191,7 +238,7 @@ public class EventManagerImpl implements OperaManager {
                         break;
                 }
             }
-            publicEventDAO.updatePublicEvent(event);
+            eventRepository.save(event);
             System.out.println("Event has been changed: " + event);
         }
     }
@@ -202,8 +249,8 @@ public class EventManagerImpl implements OperaManager {
         showEventsInDB();
         System.out.println("Input ID for selling ticket to event: ");
         Integer inputID = Integer.parseInt(input.readLine());
-        if (publicEventDAO.getPublicEventById(inputID).isPresent()) {
-            Optional<PublicEvent> eventForEdit = publicEventDAO.getPublicEventById(inputID);
+        if (eventRepository.findById(inputID).isPresent()) {
+            Optional<PublicEvent> eventForEdit = eventRepository.findById(inputID);
             //сразу преобразовываем обект в PublicEvent
             PublicEvent event = converterOptionalToPublicEvent(eventForEdit);
             // если еще есть билеты всего выпущенного меньше проданных
@@ -236,7 +283,7 @@ public class EventManagerImpl implements OperaManager {
                 System.out.println("Нет свободных билетов");
             }
             //saving
-            publicEventDAO.updatePublicEvent(event);
+            eventRepository.save(event);
         }
     }
 
@@ -247,8 +294,8 @@ public class EventManagerImpl implements OperaManager {
         System.out.println("Input ID for return ticket to event: ");
         Integer inputID = Integer.parseInt(input.readLine());
         Ticket testTicket = null;
-        if (publicEventDAO.getPublicEventById(inputID).isPresent()) {
-            Optional<PublicEvent> eventForEdit = publicEventDAO.getPublicEventById(inputID);
+        if (eventRepository.findById(inputID).isPresent()) {
+            Optional<PublicEvent> eventForEdit = eventRepository.findById(inputID);
             //сразу преобразовываем обект в PublicEvent
             PublicEvent event = converterOptionalToPublicEvent(eventForEdit);
             System.out.println("Возврат билета на мероприятие " + event);
@@ -275,9 +322,10 @@ public class EventManagerImpl implements OperaManager {
             if (testTicket == null) {
                 System.out.println("Невозможно вернуть билет с таким местом, он не продан");
             }
-            publicEventDAO.updatePublicEvent(event);
+            eventRepository.save(event);
         }
     }
+
 
     //converter from OPTIONAL TO PUBLIC EVENT
     public PublicEvent converterOptionalToPublicEvent(Optional<PublicEvent> inputEvent) {

@@ -41,10 +41,9 @@ public class PublicEvent {
     @Column(name = "tickets_sold")
     private int soldTicketsCount;// всего продано билетов
 
-    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets; //= new ArrayList<>(); // list of ticket for event
 
-    // Create new event
     public PublicEvent(Integer id, String publicEventName, String publicEventStartDate, String publicEventStartTime, int numberHall, String ratingRARS, int ticketsCount) {
         this.id = id;
         this.publicEventName = publicEventName;

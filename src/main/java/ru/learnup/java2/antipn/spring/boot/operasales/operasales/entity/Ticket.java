@@ -15,8 +15,8 @@ import javax.persistence.*;
 @Table(name = "tickets")
 public class Ticket {
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE,generator="tickets_seq")
-    @SequenceGenerator(name="tickets_seq",sequenceName="hibernate_sequence_tickets", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tickets_seq")
+    @SequenceGenerator(name = "tickets_seq", sequenceName = "hibernate_sequence_tickets", allocationSize = 1)
     @Column(name = "id")
     private Integer id; // номер билета
 

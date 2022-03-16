@@ -7,7 +7,7 @@ import ru.learnup.java2.antipn.spring.boot.operasales.operasales.entity.PublicEv
 
 import java.util.List;
 
-@Repository
+
 public interface EventRepository extends JpaRepository<PublicEvent, Integer> {
     List<PublicEvent> getAllByPublicEventNameContains(String nameContains); //по имени нативный запрос Spring
 

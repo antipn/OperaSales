@@ -6,7 +6,7 @@ import ru.learnup.java2.antipn.spring.boot.operasales.operasales.entity.Ticket;
 
 import java.util.List;
 
-@Repository
+
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     List<Ticket> getTicketsByTicketStatus(boolean statusTicket); //по статусу билета продан не продан

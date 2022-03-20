@@ -3,7 +3,7 @@ package ru.learnup.java2.antipn.spring.boot.operasales.operasales;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+//@SpringBootTest
 class OperaSalesApplicationTests {
 
     @Test

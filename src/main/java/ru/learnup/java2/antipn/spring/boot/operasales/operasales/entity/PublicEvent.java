@@ -42,7 +42,7 @@ public class PublicEvent {
     private int soldTicketsCount;// всего продано билетов
 
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets; //= new ArrayList<>(); // list of ticket for event
+    private List<Ticket> tickets; // list of ticket for event
 
     public PublicEvent(Integer id, String publicEventName, String publicEventStartDate, String publicEventStartTime, int numberHall, String ratingRARS, int ticketsCount) {
         this.id = id;
@@ -63,9 +63,80 @@ public class PublicEvent {
         this.soldTicketsCount--;
     }
 
-
     @Override
     public String toString() {
         return "ID  " + (id == null ? "" : id) + "  название: " + publicEventName + "\nАттрибуты: " + publicEventStartDate + "\t" + publicEventStartTime + "\t" + ratingRARS + "\t Номер зала " + numberHall + "\t Выпущено " + ticketsIssued + "\t Билетов продано " + soldTicketsCount;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getPublicEventName() {
+        return publicEventName;
+    }
+
+    public void setPublicEventName(String publicEventName) {
+        this.publicEventName = publicEventName;
+    }
+
+    public String getPublicEventStartDate() {
+        return publicEventStartDate;
+    }
+
+    public void setPublicEventStartDate(String publicEventStartDate) {
+        this.publicEventStartDate = publicEventStartDate;
+    }
+
+    public String getPublicEventStartTime() {
+        return publicEventStartTime;
+    }
+
+    public void setPublicEventStartTime(String publicEventStartTime) {
+        this.publicEventStartTime = publicEventStartTime;
+    }
+
+    public Integer getNumberHall() {
+        return numberHall;
+    }
+
+    public void setNumberHall(Integer numberHall) {
+        this.numberHall = numberHall;
+    }
+
+    public String getRatingRARS() {
+        return ratingRARS;
+    }
+
+    public void setRatingRARS(String ratingRARS) {
+        this.ratingRARS = ratingRARS;
+    }
+
+    public int getTicketsIssued() {
+        return ticketsIssued;
+    }
+
+    public void setTicketsIssued(int ticketsIssued) {
+        this.ticketsIssued = ticketsIssued;
+    }
+
+    public int getSoldTicketsCount() {
+        return soldTicketsCount;
+    }
+
+    public void setSoldTicketsCount(int soldTicketsCount) {
+        this.soldTicketsCount = soldTicketsCount;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }

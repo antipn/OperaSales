@@ -8,7 +8,7 @@ import ru.learnup.java2.antipn.spring.boot.operasales.operasales.entity.Ticket;
 
 import java.util.List;
 
-@Mapper//(uses = {PublicEventMapper.class})
+@Mapper(uses = {PublicEventMapper.class})
 
 public interface TicketMapper {
 

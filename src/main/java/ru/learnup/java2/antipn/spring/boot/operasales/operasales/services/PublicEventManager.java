@@ -16,11 +16,25 @@ public interface PublicEventManager {
 
     public Collection<PublicEventDto> findAllEvents();
 
+    public void deleteEventByID(int id);
+
     public TicketDto findTicketById(int id);
 
     public PublicEventDto findEventById(int id);
 
+    public PublicEventDto saveEvent(PublicEventDto eventDto);
+
+    public PublicEventDto updateEvent (PublicEventDto eventDto);
+
+    public TicketDto sellTicket(int eventId, int ticketSeat);
+
+   public TicketDto updateTicket(int id);
+
     //  repos level
+
+    public Boolean existEventByID(int id);
+
+    public Boolean existTicketByID(int id);
 
     public Collection<PublicEvent> getAllEvents();
 

@@ -34,4 +34,36 @@ public class Ticket {
     public String toString() {
         return "Номер билета = " + id + " , Номер места = " + seatNumberTicket + " , Билет доступен: " + (!ticketStatus ? "Да" : "Нет");
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public PublicEvent getEvent() {
+        return event;
+    }
+
+    public void setEvent(PublicEvent event) {
+        this.event = event;
+    }
+
+    public Integer getSeatNumberTicket() {
+        return seatNumberTicket;
+    }
+
+    public void setSeatNumberTicket(Integer seatNumberTicket) {
+        this.seatNumberTicket = seatNumberTicket;
+    }
+
+    public boolean isTicketStatus() {
+        return ticketStatus;
+    }
+
+    public void setTicketStatus(boolean ticketStatus) {
+        this.ticketStatus = ticketStatus;
+    }
 }

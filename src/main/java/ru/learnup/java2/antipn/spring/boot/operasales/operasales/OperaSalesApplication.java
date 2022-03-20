@@ -11,7 +11,8 @@ public class OperaSalesApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(OperaSalesApplication.class, args);
         PublicEventManagerImpl manager = context.getBean(PublicEventManagerImpl.class);
-
+        //manager.addEventQuick();
         manager.showEventsInDB();
+
     }
 }

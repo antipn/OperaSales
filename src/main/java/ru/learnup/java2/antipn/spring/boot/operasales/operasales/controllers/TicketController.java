@@ -21,15 +21,16 @@ public class TicketController {
         this.eventManager = eventManager;
     }
 
-    //all tickets
+
+    //all tickets DTO
     @GetMapping
     public Collection<TicketDto> tickets() {
-    return eventManager.findAllTickets();
+        return eventManager.findAllTickets();
     }
 
     //get one ticket by id
     @GetMapping("/{id}")
-    public TicketDto getTicket(@PathVariable int id){
+    public TicketDto getTicket(@PathVariable int id) {
         return eventManager.findTicketById(id);
     }
 

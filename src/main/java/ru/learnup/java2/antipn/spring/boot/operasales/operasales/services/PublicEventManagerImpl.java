@@ -6,6 +6,7 @@ import ru.learnup.java2.antipn.spring.boot.operasales.operasales.dto.PublicEvent
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.dto.TicketDto;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.entity.PublicEvent;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.entity.Ticket;
+import ru.learnup.java2.antipn.spring.boot.operasales.operasales.exception.EntityNotFoundException;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.loggers.Logger;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.mapper.PublicEventMapper;
 import ru.learnup.java2.antipn.spring.boot.operasales.operasales.mapper.TicketMapper;
@@ -51,6 +52,7 @@ public class PublicEventManagerImpl implements PublicEventManager {
 
     @Override
     public PublicEventDto findEventById(int id) {
+        checkingEventID(id);
         return mapperE.toDto(eventRepository.getById(id));
     }
 
@@ -71,12 +73,13 @@ public class PublicEventManagerImpl implements PublicEventManager {
 
     @Override
     public TicketDto findTicketById(int id) {
+        checkingTicketID(id);
         return mapperT.toDto(ticketRepository.getById(id));
     }
 
-
     @Override
     public void deleteEventByID(int id) {
+        checkingEventID(id);
         eventRepository.deleteById(id);
         System.out.println("Successfully deleted Public event " + id);
 
@@ -135,15 +138,15 @@ public class PublicEventManagerImpl implements PublicEventManager {
 
     @Override
     public TicketDto sellTicket(int eventId, int ticketSeat) {
-
+        checkingEventID(eventId);
         Ticket soldTicket = null;
         PublicEvent event = eventRepository.getById(eventId);
         int purchasingNumber = ticketSeat;
         if (event.getSoldTicketsCount() < event.getTicketsIssued()) {
-            System.out.println("Список билетов:");
-            for (Ticket ticket : event.getTickets()) {
-                System.out.println(ticket.toString());
-            }
+//            System.out.println("Список билетов:");
+//            for (Ticket ticket : event.getTickets()) {
+//                System.out.println(ticket.toString());
+//            }
             if (purchasingNumber > 0 && purchasingNumber <= event.getTickets().size()) {
                 for (Ticket ticket : event.getTickets()) {
                     //если билет есть с таким местом и он не продан
@@ -170,8 +173,38 @@ public class PublicEventManagerImpl implements PublicEventManager {
         return mapperT.toDto(soldTicket);
     }
 
+    //продажа первого свободного билета на мероприятие
+    @Override
+    public TicketDto sellTicket(int eventId) {
+        checkingEventID(eventId);
+        Ticket soldTicket = null;
+        PublicEvent event = eventRepository.getById(eventId);
+        if (event.getSoldTicketsCount() < event.getTicketsIssued()) {//если есть билеты в продаже -> которые не проданы
+            System.out.println("Есть свободные билеты");
+            for (Ticket ticket : event.getTickets()) {
+                System.out.println("Проверяем билет с номером " + ticket.getId() + " на посодочное место " + ticket.getSeatNumberTicket());
+                if (!ticket.isTicketStatus()) { //билет в продаже со статусом false
+                    ticket.setTicketStatus(true);//если нашли первый свободный билет то продаем его
+                    soldTicket = ticket;
+                    event.increaseSoldTicket();
+                    System.out.println("Билет успешно продан " + ticket.getId() + " на место " + ticket.getSeatNumberTicket());
+                    break; // заканчиваем перебор
+                }
+            }
+        } else {
+            System.out.println("Нет свободных билетов");
+        }
+        if (soldTicket != null) {
+            ticketRepository.save(soldTicket);
+        }
+        //eventRepository.save(event);
+        return mapperT.toDto(soldTicket);
+    }
+
+
     @Override
     public TicketDto updateTicket(int id) {
+        checkingTicketID(id);
         Ticket ticket = ticketRepository.getById(id);
         PublicEvent event = eventRepository.getById(ticket.getEvent().getId());
         //если билет продан и он вообще существует
@@ -187,10 +220,26 @@ public class PublicEventManagerImpl implements PublicEventManager {
             }
             System.out.println("Невозможно вернуть билет с таким местом, он не продан");
         }
-        eventRepository.save(event);
+        //eventRepository.save(event);
+        ticketRepository.save(ticket);
         return mapperT.toDto(ticket);
     }
 
+
+    //проверка наличия данных в базе
+    //проверяем что событие есть в базе
+    private void checkingEventID(int id) {
+        if (!existEventByID(id)) {
+            throw new EntityNotFoundException("PublicEvent", id, "PublicEvent not found");
+        }
+    }
+
+    //проверяем что билет есть в базе
+    private void checkingTicketID(int id) {
+        if (!existTicketByID(id)) {
+            throw new EntityNotFoundException("Ticket", id, "Ticket not found");
+        }
+    }
 
     //repositories level
 

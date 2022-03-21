@@ -38,7 +38,6 @@ public class PublicEventController {
     // http://localhost:8080/app/v1/events/1
     @GetMapping("/{id}")
     public PublicEventDto getEvent(@PathVariable int id) {
-        chekingID(id); //если не находим то выкинем исключение
         return eventManager.findEventById(id);
     }
 
@@ -46,7 +45,6 @@ public class PublicEventController {
     // http://localhost:8080/app/v1/events/1
     @DeleteMapping("/{id}")
     public void deleteEvent(@PathVariable int id) {
-        chekingID(id); //если не находим то выкинем исключение
         eventManager.deleteEventByID(id);
     }
 
@@ -61,7 +59,6 @@ public class PublicEventController {
     // http://localhost:8080/app/v1/events/update/5
     @PutMapping("/update/{id}")
     public PublicEventDto updateEvent(@RequestBody PublicEventDto eventDto, @PathVariable(name = "id") int id) {
-        chekingID(id); //проверяем что есть что обновлять
         eventDto.setId(id); //специально делаем так как может прийти eventDto с ID
         System.out.println("Updating record...");
         return eventManager.updateEvent(eventDto);
@@ -71,7 +68,6 @@ public class PublicEventController {
     // http://localhost:8080/app/v1/events/1/sell
     @GetMapping("/{id}/sell")
     public List<TicketDto> viewTickets(@PathVariable(name = "id") int id) {
-        chekingID(id);
         PublicEventDto eventDto = eventManager.findEventById(id);
         List<TicketDto> ticketsDto = eventDto.getTickets();
         return ticketsDto;
@@ -81,32 +77,24 @@ public class PublicEventController {
     // http://localhost:8080/app/v1/events/1/sell/1
     @PostMapping("/{event_id}/sell/{ticket_seat}")
     public TicketDto sellTicket(@PathVariable(name = "event_id") int eventId, @PathVariable(name = "ticket_seat") int ticketSeat) {
-        chekingID(eventId);
         System.out.println("Purchasing process...");
         return eventManager.sellTicket(eventId, ticketSeat);
+    }
+
+    //продажа билета первого свободного из доступных, чтобы не вводить номер места --> 5.1 task done
+    // http://localhost:8080/app/v1/events/1/sell/available
+    @PostMapping("/{event_id}/sell/available")
+    public TicketDto sellTicket(@PathVariable(name = "event_id") int eventId) {
+        System.out.println("Purchasing process first available ticket to event.");
+        return eventManager.sellTicket(eventId);
     }
 
     //возврат билета 6 task done
     // http://localhost:8080/app/v1/events/return/ticket/2
     @PutMapping("/return/ticket/{id}")
     public TicketDto returnTicket(@PathVariable(name = "id") int id) {
-        chekingTicketID(id);
         System.out.println("Return the ticket...");
         return eventManager.updateTicket(id);
-    }
-
-    //проверяем что событие есть в базе
-    private void chekingID(@PathVariable int id) {
-        if (!eventManager.existEventByID(id)) {
-            throw new EntityNotFoundException("PublicEvent", id, "PublicEvent not found");
-        }
-    }
-
-    //проверяем что билет есть в базе
-    private void chekingTicketID(@PathVariable int id) {
-        if (!eventManager.existTicketByID(id)) {
-            throw new EntityNotFoundException("Ticket", id, "Ticket not found");
-        }
     }
 
     @ExceptionHandler

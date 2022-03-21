@@ -28,7 +28,9 @@ public interface PublicEventManager {
 
     public TicketDto sellTicket(int eventId, int ticketSeat);
 
-   public TicketDto updateTicket(int id);
+    public TicketDto sellTicket(int eventId);
+
+    public TicketDto updateTicket(int id);
 
     //  repos level
 

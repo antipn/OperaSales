@@ -44,6 +44,7 @@ public class PublicEvent {
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets; // list of ticket for event
 
+
     public PublicEvent(Integer id, String publicEventName, String publicEventStartDate, String publicEventStartTime, int numberHall, String ratingRARS, int ticketsCount) {
         this.id = id;
         this.publicEventName = publicEventName;
